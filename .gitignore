@@ -5,6 +5,7 @@ logs/
 
 # Java specific ignores
 *.class
+*.jar
 
 # Eclipses specific ignores
 .classpath
