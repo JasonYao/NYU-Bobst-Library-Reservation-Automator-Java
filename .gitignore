@@ -1,0 +1,12 @@
+# Project specific ignores
+userLogins.csv
+settings
+logs/
+
+# Java specific ignores
+*.class
+
+# Eclipses specific ignores
+.classpath
+.project
+.settings/
