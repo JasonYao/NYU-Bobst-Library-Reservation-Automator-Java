@@ -2,9 +2,10 @@
  * Selenium imports
  */
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
 
 /**
  * Support imports
@@ -67,6 +68,9 @@ public class Automator
 	 */
 	public static void main(String[] args)
 	{
+		// Turns off annoying htmlunit warnings
+        java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.OFF);
+        
 		// Logging capability stuff
 		PrintStream pOut = null;
 		PrintStream pErr = null;
@@ -217,10 +221,13 @@ public class Automator
 		// Start of going through the registration with each user
 		for (int i = 0; i < users.size(); ++i)
 		{
+			// Resets the AM at the end of the loop, since it's a static variable
+			AM_PM = true;
 			// Builds a browser connection
 			WebDriver browser = new FirefoxDriver();
+			//HtmlUnitDriver browser = new HtmlUnitDriver(BrowserVersion.);
+			//browser.setJavascriptEnabled(true);
 			System.out.println("Browser is now open");
-			
 			try
 			{
 				// Starts automation for user
@@ -233,13 +240,15 @@ public class Automator
 				
 		        // Sleep until the div we want is visible or 15 seconds is over
 				FluentWait<WebDriver> fluentWait = new FluentWait<WebDriver>(browser)
-		        		.withTimeout(15, TimeUnit.SECONDS)
+		        		.withTimeout(20, TimeUnit.SECONDS)
 		        		.pollingEvery(500, TimeUnit.MILLISECONDS)
 		        		.ignoring(NoSuchElementException.class);
 		        
 				fluentWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@id='shibboleth']")));
 
 		        browser.findElement(By.xpath("//div[@id='shibboleth']/p[1]/a")).click();
+		        
+		        fluentWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//form[@id='login']")));
 		        
 		        // Now we're at the login page
 		        WebElement username = browser.findElement(By.xpath("//form[@id='login']/input[1]"));
@@ -250,17 +259,27 @@ public class Automator
 		        password.sendKeys(users.get(i).getPassword()); 
 		        browser.findElement(By.xpath("//form[@id='login']/input[3]")).click();
 
-		        if (browser.getCurrentUrl() == "https://shibboleth.nyu.edu/idp/Authn/UserPassword")
+		        if (browser.getCurrentUrl().equals("https://shibboleth.nyu.edu:443/idp/Authn/UserPassword") ||
+		        		(browser.getCurrentUrl().equals("https://shibboleth.nyu.edu/idp/Authn/UserPassword")))
 		        	throw new InvalidLoginException("User " + i + " had invalid login credentials");
 		        
 		        // START OF FUCKING AROUND WITH THE DATEPICKER
-		        fluentWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//form[@class='form-horizontal']")));
-
+		        // Error checking that rooms.library.nyu.edu pops up
+		        int count = 0;
+		        while ((!browser.getCurrentUrl().equals("https://rooms.library.nyu.edu/")) && (count < 5))
+		        {
+		        	browser.navigate().refresh();
+		        	Thread.sleep(5000);
+		        	fluentWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='well well-sm']")));
+		        	++count;
+		        }
+		        
 		        browser.findElement(By.xpath(
 		        		"//form[@class='form-horizontal']/div[@class='well well-sm']" + 
 		        		"/div[@class='form-group has-feedback']/div[@class='col-sm-6']/input[1]"
 		        		)).click();
 		        
+		        Thread.sleep(5000);
 		        
 		        // Checks the month and year, utilizes a wait for the year for the form to pop up
 		        WebElement datePickerYear = fluentWait.until(
@@ -352,7 +371,10 @@ public class Automator
 		        	throw new ReservationException("The user number: " + i + " has already reserved a room for today");
 		        
 		        // Waits for the reservation to pop up
-		        fluentWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='modal-content']")));
+		        fluentWait.until(
+		        		ExpectedConditions.presenceOfElementLocated(
+		        				By.xpath("//div[@class='modal-content']/div[@class='modal-body']/div[@class='modal-body-content']")
+		        		));
 		        
 		        WebElement descriptionElement = fluentWait.until(
 		        		ExpectedConditions.presenceOfElementLocated(By.id("reservation_title")));
@@ -371,7 +393,38 @@ public class Automator
 		        		"//form[@id='new_reservation']/table[@id='availability_grid_table']/tbody/tr[contains(., '" + roomText + "')]")
 		        );
 		        
-		        WebElement timeSlot = divFind.findElement(By.xpath("td[@class='timeslot timeslot_available timeslot_preferred']"));
+		        WebElement timeSlot = null;
+		        // Tries to get the next best time if it doesn't work
+		        try
+		        {
+		        	timeSlot = divFind.findElement(By.xpath("td[@class='timeslot timeslot_available timeslot_preferred']"));
+		        }
+		        catch (NoSuchElementException e)
+		        {
+		        	System.err.println("The timeslot was already taken for user: " + i + ", taking next best time");
+		        	boolean found = false;
+		        	
+		        	// Continuously clicks the next button and checks until a time is found
+		        	while (found == false)
+		        	{
+			        	try
+			        	{
+			        		// Clicks the button once
+			        		browser.findElement(By.xpath("//div[@class='rebuild_grid rebuild_grid_next']")).click();
+			        		
+			        		// Rechecks to find the timeSlot
+			        		timeSlot = divFind.findElement(By.xpath("td[@class='timeslot timeslot_available timeslot_preferred']"));
+			        		
+			        		// If it gets to this point, the timeslot is found, sets found = true
+			        		found = true;
+			        	}
+			        	catch (NoSuchElementException ex)
+			        	{
+			        		// Still didn't find an available timeslot, continues search
+			        	}	
+		        	} // End of while loop
+		        } // End of finding a time if original preference could not be found
+		        
 		        timeSlot.click();
 		        
 		        // Submits
@@ -391,15 +444,31 @@ public class Automator
 		        Thread.sleep(3000);
 			}
 			catch (UserNumberException e)
-			{System.err.println(e.getMessage());}
+			{
+				System.err.println(e.getMessage());
+				System.out.println("User number " + i + " status: failed");
+			}
 			catch(ReservationException e)
-			{System.err.println(e.getMessage());}
+			{
+				System.err.println(e.getMessage());
+				System.out.println("User number " + i + " status: failed");
+			}
 			catch(TimeoutException e)
-			{System.err.println(e.getMessage());}
+			{
+				System.err.println(e.getMessage());
+				System.out.println("User number " + i + " status: failed");
+			}
 			catch(InvalidLoginException e)
-			{System.err.println(e.getMessage());}
+			{
+				System.err.println(e.getMessage());
+				System.out.println("User number " + i + " status: failed");
+			}
 			catch (InterruptedException e)
-			{System.err.println("Sleep at end was interrupted");}
+			{
+				System.err.println("Sleep at end was interrupted");
+				System.out.println("User number " + i + " status: failed");
+			}
+			
 			catch (Exception e)
 			{
 				System.err.println("Shit, something happened that wasn't caught");
@@ -409,6 +478,10 @@ public class Automator
 			{
 				// Logs out
 				browser.get("https://rooms.library.nyu.edu/logout");
+				try
+				{Thread.sleep(10000);}
+				catch (InterruptedException e1)
+				{System.err.println("Something wrong when trying to sleep after logout");}
 				
 				// Deletes cookies
 				browser.manage().deleteAllCookies();
@@ -416,6 +489,7 @@ public class Automator
 				
 				// Closes the browser connection
 				browser.close();
+				System.out.println("Browser is now closed");
 				try {Thread.sleep(5000);}
 				catch (InterruptedException e)
 				{System.out.println("Sleep at end was interrupted");}
