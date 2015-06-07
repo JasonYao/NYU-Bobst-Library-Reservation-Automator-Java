@@ -160,9 +160,7 @@ public class Automator
 				throw new IOException("userLogins.csv does not exist, or is a directory");
 		}
 		catch (IOException e)
-		{
-			System.err.println(e.getMessage());
-		}
+		{System.err.println(e.getMessage());}
 		
 		// Builds an array of users based off of .csv
 		// Opens file stream
@@ -178,9 +176,7 @@ public class Automator
 			for (String line; (line = br.readLine()) != null; )
 			{
 				if (lineSkip)
-				{
 					lineSkip = false;
-				}
 				else
 				{
 					boolean timestampSkip = true;
