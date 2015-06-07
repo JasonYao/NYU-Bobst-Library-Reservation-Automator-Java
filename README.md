@@ -4,7 +4,23 @@
 An automator written in Python to automatically book the room you want, can be paired with cron to run daily
 
 ## Usage
+[For Unix systems including OSX]:
+`mkdir ~/projects` -> Creates a directory out of the way to house the app
+
+`cd ~/projects` -> This will bring you into the just created overarching directory
+
+`git clone https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java.git` -> Downloads the app
+
+`cd NYU-Bobst-Library-Reservation-Automator-Java` -> Brings you into the app directory
+
+`cp settings.example settings` -> Moves the example settings file to the one you'll actually use
+
+`nano settings` -> Edit the settings file using the nano editor, it's pretty self-explanatory. When done with editing, use `CTRL` + `x`, and then `y` and `ENTER` to save the settings file.
+
+Download your use logins file by exporting from the google docs, and then move it into the `~/projects/NYU-Bobst-Library-Reservation-Automator-Java` directory.
+
 `java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
+
 NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so should work for Java 8.x, if you have errors and have an older version of Java, please update first and try again.
 
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
