@@ -18,7 +18,7 @@ An automator written in Python to automatically book the room you want, can be p
 
 `nano settings` -> Edit the settings file using the nano editor, it's pretty self-explanatory. When done with editing, use `CTRL` + `x`, and then `y` and `ENTER` to save the settings file.
 
-Download your use logins file by exporting from the google docs, and then move it into the `~/projects/NYU-Bobst-Library-Reservation-Automator-Java` directory.
+Download your user logins file by exporting from the google docs, and then move it into the `~/projects/NYU-Bobst-Library-Reservation-Automator-Java` directory.
 
 `java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
 
