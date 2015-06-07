@@ -30,6 +30,11 @@ NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so sh
 NOTE: You should only do the following commands ONCE in order to set up daily automatic running.
 `./time` -> This will make it so that the app is run every day at 0001.
 
+### Headless Unix
+If you are using a unix server through a VPS such as [Digital Ocean](https://digitalocean.com), then instead of the GUI-version of this app, you'll want to clone from the 
+[headlessUnix](https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/tree/headlessUnix) branch. Everything else should still remain the same with the commands above, except 
+replace the git clone command with `git clone -b headlessUnix https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java.git`
+
 ## The Explaination
 NYU's Library system makes it annoying for students because each student is limited to one booking every 24 hours.
 This script is meant to help alleviate the issue, by having it done automatically for you.
