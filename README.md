@@ -4,14 +4,13 @@
 An automator written in Python to automatically book the room you want, can be paired with cron to run daily
 
 ## Usage
-`./run` -> This will compile and run the program for you. If you'd like to manually do this, you can do so below.
-
-### The 'hard' way
-`javac Automator`
-
-`java Automator`
+`java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
+NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so should work for Java 8.x, if you have errors and have an older version of Java, please update first and try again.
 
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
+
+### Automating for every day
+TODO show instructions for automatically setting up cron jobs to run the java applet every 24 hours.
 
 ## The Explaination
 NYU's Library system makes it annoying for students because each student is limited to one booking every 24 hours.
