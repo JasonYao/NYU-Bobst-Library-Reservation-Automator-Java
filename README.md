@@ -5,6 +5,7 @@ An automator written in Python to automatically book the room you want, can be p
 
 ## Usage
 [For Unix systems including OSX]:
+
 `mkdir ~/projects` -> Creates a directory out of the way to house the app
 
 `cd ~/projects` -> This will bring you into the just created overarching directory
@@ -26,7 +27,8 @@ NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so sh
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
 
 ### Automating for every day
-TODO show instructions for automatically setting up cron jobs to run the java applet every 24 hours.
+NOTE: You should only do the following commands ONCE in order to set up daily automatic running.
+`./time` -> This will make it so that the app is run every day at 0001.
 
 ## The Explaination
 NYU's Library system makes it annoying for students because each student is limited to one booking every 24 hours.
