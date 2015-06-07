@@ -21,8 +21,6 @@ import java.io.IOException;
 import org.openqa.selenium.TimeoutException;
 import java.io.FileNotFoundException;
 
-
-
 /**
  * Time imports
  */
