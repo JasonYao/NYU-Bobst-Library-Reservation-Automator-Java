@@ -1,8 +1,9 @@
 # NYU-Bobst-Library-Reservation-Automator-Java
 
 ## Description
-An automator written in Python to automatically book the room you want at Bobst Libarary for New York University students. This software is given as-is, and I am not liable nor responsible for 
-whatever may result of you using this software.
+An automator written in Java to automatically book the room you want at Bobst Libarary for New York University students. This software is given as-is, and I am not liable nor responsible for 
+whatever may result of you using this software. NOTE: This software is built for, tested on, and works for linux and OSX systems. If you have a windows machine, I'd normally say that you're shit 
+out of luck, but since this was written in Java, just install Java, and set up a windows scheduler to run java -jar Automator.jar every day, instead of using my pwetty `./time.sh` commands.
 
 ## Usage
 
