@@ -504,6 +504,7 @@ public class Automator
 			catch (Exception e)
 			{
 				System.err.println("Shit, something happened that wasn't caught");
+				System.out.println("User number " + i + " status: failed");
 				e.printStackTrace();
 
 				// Updates the dailyStatus log
