@@ -1,11 +1,14 @@
 # NYU-Bobst-Library-Reservation-Automator-Java
 
 ## Description
-An automator written in Python to automatically book the room you want, can be paired with cron to run daily
+An automator written in Python to automatically book the room you want at Bobst Libarary for New York University students. This software is given as-is, and I am not liable nor responsible for 
+whatever may result of you using this software.
 
 ## Usage
 
 ### Initial Directory Setup (For Unix systems including OSX)
+
+0.) Open up your terminal, and start copying the codes fragments below
 
 1.) `mkdir ~/projects` -> Creates a directory out of the way to house the app
 
