@@ -23,7 +23,7 @@ An automator written in Python to automatically book the room you want, can be p
 
 ### Running the program manually (yuck)
 
-`java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
+1.) `java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
 
 NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so should work for Java 8.x, if you have errors and have an older version of Java, please update first and try again.
 
@@ -31,8 +31,7 @@ NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so sh
 
 #### For Unix systems including OSX that have a graphical display
 
-`time.sh` -> Automatically sets up your script to run at 0001 each day. NOTE: make sure to add at least one extra line to your crontab, by `crontab -e`, and pressing `ENTER` a couple of times at 
-the end of the file.
+`time.sh` -> Automatically sets up your script to run at 0001 each day.
 
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
 
@@ -44,12 +43,11 @@ I'm not even going to bother here. Follow [Digital Ocean's tutorial](https://www
 
 ##### Setup and running
 
-`nano time.sh` -> Edit this file and uncomment out the part where I told you to uncomment.
+`nano run.sh` -> Edit this file and uncomment out the part where I told you to uncomment.
 
 `CTRL` + `x`, `y` -> This will save your changes made
 
-`./time.sh` -> And now you're done, and you're set to automatically run the app at 0001 each day. NOTE: make sure to add at least one extra line to your crontab, by `crontab -e`, and pressing 
-`ENTER` a couple of times at the end of the file.
+`./time.sh` -> And now you're done, and you're set to automatically run the app at 0001 each day.
 
 ## The Explaination
 NYU's Library system makes it annoying for students because each student is limited to one booking every 24 hours.
