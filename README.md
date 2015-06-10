@@ -4,36 +4,54 @@
 An automator written in Python to automatically book the room you want, can be paired with cron to run daily
 
 ## Usage
+
+### Initial Directory Setup
+
 [For Unix systems including OSX]:
 
-`mkdir ~/projects` -> Creates a directory out of the way to house the app
+1.) `mkdir ~/projects` -> Creates a directory out of the way to house the app
 
-`cd ~/projects` -> This will bring you into the just created overarching directory
+2.) `cd ~/projects` -> This will bring you into the just created overarching directory
 
-`git clone https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java.git` -> Downloads the app
+3.) `git clone https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java.git` -> Downloads the app
 
-`cd NYU-Bobst-Library-Reservation-Automator-Java` -> Brings you into the app directory
+4.) `cd NYU-Bobst-Library-Reservation-Automator-Java` -> Brings you into the app directory
 
-`cp settings.example settings` -> Moves the example settings file to the one you'll actually use
+5.) `cp settings.example settings` -> Moves the example settings file to the one you'll actually use
 
-`nano settings` -> Edit the settings file using the nano editor, it's pretty self-explanatory. When done with editing, use `CTRL` + `x`, and then `y` and `ENTER` to save the settings file.
+6.) `nano settings` -> Edit the settings file using the nano editor, it's pretty self-explanatory. When done with editing, use `CTRL` + `x`, and then `y` and `ENTER` to save the settings file.
 
-Download your user logins file by exporting from the google docs, and then move it into the `~/projects/NYU-Bobst-Library-Reservation-Automator-Java` directory.
+7.) Download your user logins file by exporting from the google docs, and then move it into the `~/projects/NYU-Bobst-Library-Reservation-Automator-Java` directory.
+
+### Running the program manually (yuck)
 
 `java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
 
 NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so should work for Java 8.x, if you have errors and have an older version of Java, please update first and try again.
 
+### Setup to run the program automatically each day
+
+#### For Unix systems including OSX that have a graphical display
+
+`time.sh` -> Automatically sets up your script to run at 0001 each day. NOTE: make sure to add at least one extra line to your crontab, by `crontab -e`, and pressing `ENTER` a couple of times at 
+the end of the file.
+
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
 
-### Automating for every day
-NOTE: You should only do the following commands ONCE in order to set up daily automatic running.
-`./time` -> This will make it so that the app is run every day at 0001.
+#### For Unix systems including OSX that do NOT have a graphical display
 
-### Headless Unix
-If you are using a unix server through a VPS such as [Digital Ocean](https://digitalocean.com), then instead of the GUI-version of this app, you'll want to clone from the 
-[headlessUnix](https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/tree/headlessUnix) branch. Everything else should still remain the same with the commands above, except 
-replace the git clone command with `git clone -b headlessUnix https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java.git`
+##### Installing VNC
+
+I'm not even going to bother here. Follow [Digital Ocean's tutorial](https://www.digitalocean.com/tutorials/how-to-install-and-configure-vnc-on-ubuntu-14-04), and you should be good.
+
+##### Setup and running
+
+`nano time.sh` -> Edit this file and uncomment out the part where I told you to uncomment.
+
+`CTRL` + `x`, `y` -> This will save your changes made
+
+`./time.sh` -> And now you're done, and you're set to automatically run the app at 0001 each day. NOTE: make sure to add at least one extra line to your crontab, by `crontab -e`, and pressing 
+`ENTER` a couple of times at the end of the file.
 
 ## The Explaination
 NYU's Library system makes it annoying for students because each student is limited to one booking every 24 hours.
