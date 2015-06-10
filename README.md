@@ -29,13 +29,13 @@ out of luck, but since this was written in Java, just install Java, and set up a
 
 1.) `java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
 
-NOTE: This java was built and compiled and tested using Java 1.8.0_25, and so should work for Java 8.x, if you have errors and have an older version of Java, please update first and try again.
+NOTE: This Java app was built and compiled and tested using Java 1.8.0_25, and so should work for Java 8.x, if you have errors and have an older version of Java, please update first and try again.
 
 ### Setup to run the program automatically each day
 
 #### For Unix systems including OSX that have a graphical display
 
-`time.sh` -> Automatically sets up your script to run at 0001 each day.
+`time.sh` -> Automatically sets up your script to run at 0001 each day. Ain't this shit easy?
 
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
 
