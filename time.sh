@@ -1,11 +1,23 @@
 #!/bin/bash -e
 
-#write out current crontab
+# Write out current crontab
 crontab -l > tempCron
 
 # Runs the Java applet every day at midnight
-echo "01 00 * * * java -jar ~/projects/NYU-Bobst-Library-Reservation-Automator-Java/Automator.jar" >> tempCron
+if [[ "$OSTYPE" == "linux-gnu" ]];
+        then
+                echo "01 00 * * * /bin/bash /home/$(whoami)/projects/NYU-Bobst-Library-Reservation-Automator-Java/run.sh" >> tempCron;
+                echo "Automator app added to linux scheduler";
+elif [[ "$OSTYPE" == "darwin"* ]];
+        then
+                echo "01 00 * * * /bin/bash /Users/$(whoami)/projects/NYU-Bobst-Library-Reservation-Automator-Java/run.sh" >> tempCron;
+                echo "Automator app added to OSX scheduler";
+fi
 
-#install new cron file
+# Adds a newline character
+echo  >> tempCron;
+
+# Installs new cron file
 crontab tempCron
 rm tempCron
+
