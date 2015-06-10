@@ -6,7 +6,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-
 /**
  * Support imports
  */
@@ -18,11 +17,8 @@ import org.openqa.selenium.support.ui.FluentWait;
  * Exception imports
  */
 import org.openqa.selenium.NoSuchElementException;
-
 import java.io.IOException;
-
 import org.openqa.selenium.TimeoutException;
-
 import java.io.FileNotFoundException;
 
 /**
@@ -37,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -55,7 +50,7 @@ import java.io.PrintStream;
 import java.io.FileOutputStream;
 
 /**
- * @author Jason
+ * @author Jason Yao
  * This Java class is an executable that is able to automatically reserve a room at NYU's Bobst Library
  */
 public class Automator
@@ -74,43 +69,6 @@ public class Automator
 	{
 		// Turns off annoying htmlunit warnings
 		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.OFF);
-
-		// Logging capability stuff
-		PrintStream pOut = null;
-		PrintStream pErr = null;
-		FileOutputStream fOut = null;
-		FileOutputStream fErr = null;
-		File logs = null;
-		File status = null;
-		File errors = null;
-		File dailyStatus = null;
-		PrintWriter dailyStatusWriter = null;
-		try
-		{
-			// Creates the directory hierarchy
-			logs = new File("logs");
-			if (!logs.isDirectory())
-				logs.mkdir();
-			status = new File("logs/status");
-			if (!status.isDirectory())
-				status.mkdir();
-			errors = new File("logs/errors");
-			if (!errors.isDirectory())
-				errors.mkdir();
-
-			fOut = new FileOutputStream("logs/status/" + LocalDate.now().toString() + ".log");
-			fErr = new FileOutputStream("logs/errors/" + LocalDate.now().toString() + ".err");
-			pOut = new PrintStream(fOut);
-			pErr = new PrintStream(fErr);
-			System.setOut(pOut);
-			System.setErr(pErr);
-
-			// Set up daily status writer
-			dailyStatus = new File("dailyStatus");
-			dailyStatusWriter = new PrintWriter(dailyStatus);
-		}
-		catch (FileNotFoundException e2)
-		{System.err.println("Couldn't find the logging file");}
 
 		// Setting inheritance stuff
 		Properties settings = new Properties();
@@ -162,6 +120,43 @@ public class Automator
 		{System.out.println(e.getMessage());}
 
 		String reservationDay = Integer.toString(reservationDate.getDayOfMonth());
+
+		// Logging capability stuff
+		File logs = null;
+
+		// Error logging
+		PrintStream pErr = null;
+		FileOutputStream fErr = null;
+		File errors = null;
+
+		// Status logging
+		PrintStream pOut = null;
+		FileOutputStream fOut = null;
+		File status = null;
+
+		try
+		{
+			// Creates the directory hierarchy
+			logs = new File("logs");
+			if (!logs.isDirectory())
+				logs.mkdir();
+			status = new File("logs/status");
+			if (!status.isDirectory())
+				status.mkdir();
+			errors = new File("logs/errors");
+			if (!errors.isDirectory())
+				errors.mkdir();
+
+			fOut = new FileOutputStream("logs/status/" + reservationDate.toString() + ".status");
+			fErr = new FileOutputStream("logs/errors/" + reservationDate.toString() + ".err");
+			pOut = new PrintStream(fOut);
+			pErr = new PrintStream(fErr);
+			System.setOut(pOut);
+			System.setErr(pErr);
+
+		}
+		catch (FileNotFoundException e2)
+		{System.err.println("Couldn't find the logging file");}
 
 		// Checks for user logins .csv file existence
 		File userLogins = new File(userLoginsFilePath);
@@ -233,11 +228,13 @@ public class Automator
 		{
 			// Resets the AM at the end of the loop, since it's a static variable
 			AM_PM = true;
+
 			// Builds a browser connection
 			WebDriver browser = new FirefoxDriver();
-			//HtmlUnitDriver browser = new HtmlUnitDriver(BrowserVersion.);
+
+			//HtmlUnitDriver browser = new HtmlUnitDriver(BrowserVersion.CHROME);
 			//browser.setJavascriptEnabled(true);
-			System.out.println("Browser is now open");
+
 			try
 			{
 				// Starts automation for user
@@ -452,72 +449,65 @@ public class Automator
 
 				// Final status update
 				System.out.println("User number " + i + " status: successful");
-				Thread.sleep(3000);
 
 				// Updates the dailyStatus log
 				String militaryTime = toMilitaryTime(i);
-				String line = militaryTime + ": Reserved";
-				dailyStatusWriter.println(line);
+				System.out.println(militaryTime + ": Reserved");
+				Thread.sleep(3000);
 			}
 			catch (UserNumberException e)
 			{
 				System.err.println(e.getMessage());
 				System.out.println("User number " + i + " status: failed");
-				
+
 				// Updates the dailyStatus log
 				String militaryTime = toMilitaryTime(i);
-				String line = militaryTime + ": Not Reserved";
-				dailyStatusWriter.println(line);
+				System.out.println(militaryTime + ": Not Reserved");
 			}
 			catch(ReservationException e)
 			{
 				System.err.println(e.getMessage());
 				System.out.println("User number " + i + " status: failed");
-				
+
 				// Updates the dailyStatus log
 				String militaryTime = toMilitaryTime(i);
-				String line = militaryTime + ": Not Reserved";
-				dailyStatusWriter.println(line);
+				System.out.println(militaryTime + ": Not Reserved");
 			}
 			catch(TimeoutException e)
 			{
 				System.err.println(e.getMessage());
 				System.out.println("User number " + i + " status: failed");
-				
+
 				// Updates the dailyStatus log
 				String militaryTime = toMilitaryTime(i);
-				String line = militaryTime + ": Not Reserved";
-				dailyStatusWriter.println(line);
+				System.out.println(militaryTime + ": Not Reserved");
 			}
 			catch(InvalidLoginException e)
 			{
 				System.err.println(e.getMessage());
 				System.out.println("User number " + i + " status: failed");
-				
+
 				// Updates the dailyStatus log
 				String militaryTime = toMilitaryTime(i);
-				String line = militaryTime + ": Not Reserved";
-				dailyStatusWriter.println(line);
+				System.out.println(militaryTime + ": Not Reserved");
 			}
 			catch (InterruptedException e)
 			{
 				System.err.println("Sleep at end was interrupted");
 				System.out.println("User number " + i + " status: failed");
-				
+
 				// Updates the dailyStatus log
 				String militaryTime = toMilitaryTime(i);
-				String line = militaryTime + ": Not Reserved";
-				dailyStatusWriter.println(line);
+				System.out.println(militaryTime + ": Not Reserved");
 			}
 			catch (Exception e)
 			{
 				System.err.println("Shit, something happened that wasn't caught");
 				e.printStackTrace();
-				
+
 				// Updates the dailyStatus log
 				String militaryTime = toMilitaryTime(i);
-				String line = militaryTime + ": Not Reserved";
-				dailyStatusWriter.println(line);
+				System.out.println(militaryTime + ": Not Reserved");
 			}
 			finally
 			{
@@ -537,15 +527,10 @@ public class Automator
 				System.out.println("Browser is now closed");
 				try {Thread.sleep(5000);}
 				catch (InterruptedException e)
-				{System.out.println("Sleep at end was interrupted");}
+				{System.err.println("Sleep at end was interrupted");}
 			}
 		} //End of for loop
-		
-		// Adds the date for the daily log status
-		// Updates the dailyStatus log
-		String line = "Date: " + reservationDate;
-		dailyStatusWriter.println(line);
-		
+
 		// Closes logging streams
 		if (pOut != null)
 			pOut.close();
@@ -565,8 +550,6 @@ public class Automator
 			catch (IOException e)
 			{System.err.println("File output error stream had errors when closing");}
 		}
-		if (dailyStatusWriter != null)
-			dailyStatusWriter.close();
 	} // End of the main method
 
 	/* Helper Methods */
