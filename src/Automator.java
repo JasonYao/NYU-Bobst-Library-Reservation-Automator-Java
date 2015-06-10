@@ -137,27 +137,26 @@ public class Automator
 		try
 		{
 			// Creates the directory hierarchy
-			logs = new File("~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs");
+			logs = new File("logs");
 			if (!logs.isDirectory())
 				logs.mkdir();
-			status = new File("~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/status");
+			status = new File("logs/status");
 			if (!status.isDirectory())
 				status.mkdir();
-			errors = new File("~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/errors");
+			errors = new File("logs/errors");
 			if (!errors.isDirectory())
 				errors.mkdir();
 
 			fOut = new FileOutputStream(
-					"~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/status/" + reservationDate.toString() + ".status");
+					"logs/status/" + reservationDate.toString() + ".status");
 			fErr = new FileOutputStream(
-					"~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/errors/" + reservationDate.toString() + ".err");
+					"logs/errors/" + reservationDate.toString() + ".err");
 			pOut = new PrintStream(fOut);
 			pErr = new PrintStream(fErr);
 			System.setOut(pOut);
 			System.setErr(pErr);
-
 		}
-		catch (FileNotFoundException e2)
+		catch (FileNotFoundException ex)
 		{System.err.println("Couldn't find the logging file");}
 
 		// Checks for user logins .csv file existence
