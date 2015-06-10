@@ -35,7 +35,7 @@ NOTE: This Java app was built and compiled and tested using Java 1.8.0_25, and s
 
 #### For Unix systems including OSX that have a graphical display
 
-`time.sh` -> Automatically sets up your script to run at 0001 each day. Ain't this shit easy?
+`./time.sh` -> Automatically sets up your script to run at 0001 each day. Ain't this shit easy?
 
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
 
