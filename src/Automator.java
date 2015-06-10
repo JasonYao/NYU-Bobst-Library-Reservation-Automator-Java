@@ -232,6 +232,7 @@ public class Automator
 
 			// Builds a browser connection
 			WebDriver browser = new FirefoxDriver();
+			browser.manage().window().maximize();
 
 			//HtmlUnitDriver browser = new HtmlUnitDriver(BrowserVersion.CHROME);
 			//browser.setJavascriptEnabled(true);
