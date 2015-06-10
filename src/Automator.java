@@ -137,18 +137,20 @@ public class Automator
 		try
 		{
 			// Creates the directory hierarchy
-			logs = new File("logs");
+			logs = new File("~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs");
 			if (!logs.isDirectory())
 				logs.mkdir();
-			status = new File("logs/status");
+			status = new File("~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/status");
 			if (!status.isDirectory())
 				status.mkdir();
-			errors = new File("logs/errors");
+			errors = new File("~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/errors");
 			if (!errors.isDirectory())
 				errors.mkdir();
 
-			fOut = new FileOutputStream("logs/status/" + reservationDate.toString() + ".status");
-			fErr = new FileOutputStream("logs/errors/" + reservationDate.toString() + ".err");
+			fOut = new FileOutputStream(
+					"~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/status/" + reservationDate.toString() + ".status");
+			fErr = new FileOutputStream(
+					"~/projects/NYU-Bobst-Library-Reservation-Automator-Java/logs/errors/" + reservationDate.toString() + ".err");
 			pOut = new PrintStream(fOut);
 			pErr = new PrintStream(fErr);
 			System.setOut(pOut);
