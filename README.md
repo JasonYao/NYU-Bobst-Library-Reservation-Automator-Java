@@ -5,9 +5,7 @@ An automator written in Python to automatically book the room you want, can be p
 
 ## Usage
 
-### Initial Directory Setup
-
-[For Unix systems including OSX]:
+### Initial Directory Setup (For Unix systems including OSX)
 
 1.) `mkdir ~/projects` -> Creates a directory out of the way to house the app
 
