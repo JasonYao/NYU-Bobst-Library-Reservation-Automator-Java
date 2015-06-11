@@ -228,7 +228,7 @@ public class Automator
 		for (int i = 0; i < users.size(); ++i)
 		{
 			// Resets the AM at the end of the loop, since it's a static variable
-			AM_PM = true;
+			setAM_PM(true);
 
 			// Builds a browser connection
 			WebDriver browser = new FirefoxDriver();
@@ -353,7 +353,7 @@ public class Automator
 
 				// Selects AM/PM
 				Select reservationAMPM = new Select(browser.findElement(By.cssSelector("select#reservation_ampm")));
-				if (AM_PM)
+				if (isAM_PM())
 					reservationAMPM.selectByValue("am");
 				else
 					reservationAMPM.selectByValue("pm");
@@ -564,7 +564,7 @@ public class Automator
 	 */
 	private static String toMilitaryTime(int userID)
 	{
-		int time = timePreference[userID];
+		int time = getTimePreference()[userID];
 		String stringTime = "";
 
 		if (time < 10)
@@ -628,7 +628,7 @@ public class Automator
 		int timeStart = 0;
 		if ((userNumber < 0) || (userNumber > 11))
 			throw new UserNumberException("User number is invalid: " + userNumber);
-		timeStart = timePreference[userNumber];
+		timeStart = getTimePreference()[userNumber];
 
 		if ((timeStart >= 12) && (timeStart < 24))
 		{
