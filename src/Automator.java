@@ -242,10 +242,7 @@ public class Automator
 				// Starts automation for user
 				System.out.println("User number: " + i + " status: starting");
 
-				browser.get("https://login.library.nyu.edu/pds?func=load-login&institute=NYU&calling_system=https:"
-						+ "login.library.nyu.edu&url=https%3A%2F%2Frooms.library.nyu.edu%2Fvalidate%3Freturn_url%3Dhttps"
-						+ "%253A%252F%252Frooms.library.nyu.edu%252F%26https%3A%2F%2Flogin.library.nyu.edu_action%3Dnew%2"
-						+ "6https%3A%2F%2Flogin.library.nyu.edu_controller%3Duser_sessions");
+				browser.get("https://login.library.nyu.edu/users/auth/nyu_shibboleth?auth_type=nyu&institution=NYU");
 
 				// Sleep until the div we want is visible or 15 seconds is over
 				FluentWait<WebDriver> fluentWait = new FluentWait<WebDriver>(browser)
@@ -253,24 +250,21 @@ public class Automator
 						.pollingEvery(500, TimeUnit.MILLISECONDS)
 						.ignoring(NoSuchElementException.class);
 
-				fluentWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@id='shibboleth']")));
-
-				browser.findElement(By.xpath("//div[@id='shibboleth']/p[1]/a")).click();
-
 				fluentWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//form[@id='login']")));
-
 				// Now we're at the login page
 				WebElement username = browser.findElement(By.xpath("//form[@id='login']/input[1]"));
 				WebElement password = browser.findElement(By.xpath("//form[@id='login']/input[2]"));
 
 				// Signs into the bobst reserve with the user's username and password
 				username.sendKeys(users.get(i).getUsername());
-				password.sendKeys(users.get(i).getPassword()); 
+				password.sendKeys(users.get(i).getPassword());
 				browser.findElement(By.xpath("//form[@id='login']/input[3]")).click();
 
 				if (browser.getCurrentUrl().equals("https://shibboleth.nyu.edu:443/idp/Authn/UserPassword") ||
 						(browser.getCurrentUrl().equals("https://shibboleth.nyu.edu/idp/Authn/UserPassword")))
 					throw new InvalidLoginException("User " + i + " had invalid login credentials");
+
+				browser.get("https://rooms.library.nyu.edu/");
 
 				// START OF FUCKING AROUND WITH THE DATEPICKER
 				// Error checking that rooms.library.nyu.edu pops up
