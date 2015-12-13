@@ -11,3 +11,9 @@ logs/
 .classpath
 .project
 .settings/
+
+# IntelliJ specific ignores
+.idea/
+
+# OSX specific ignores
+.DS_STore
