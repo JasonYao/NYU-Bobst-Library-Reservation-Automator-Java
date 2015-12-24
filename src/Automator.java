@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 /**
  * Time imports
  */
-import java.time.*;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,8 +58,32 @@ public class Automator
 	// Global Variables
 	private static boolean AM_PM = true; // Current time set is AM if true, PM if false
 	private static int[] timePreference = {
-		12, 14, 16, 18, 20, 22, 10, 8, 6, 4, 2, 0
+			12, 14, 16, 18, 20, 22, 10, 8, 6, 4, 2, 0
 	}; // The array of reservation times ordered in 2 hour blocks
+
+	// Settings
+	private static int TIME_DELTA;
+	private static String DESCRIPTION;
+	private static String FLOOR_NUMBER;
+	private static String ROOM_NUMBER;
+	private static String USER_LOGIN_FILEPATH;
+
+	// Dates
+	private static String RESERVATION_YEAR;
+	private static String RESERVATION_MONTH;
+	private static String RESERVATION_DAY;
+
+	// Logging
+		// Error logging
+		private static PrintStream pErr;
+		private static FileOutputStream fErr;
+
+		// Status logging
+		private static PrintStream pOut;
+		private static FileOutputStream fOut;
+
+	// Users
+	private static UserPool USER_POOL;
 
 	/**
 	 * Main function to run the Automator
@@ -67,185 +91,39 @@ public class Automator
 	 */
 	public static void main(String[] args)
 	{
-		// Turns off annoying htmlunit warnings
-		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.OFF);
+		getAndSetSettings();
+		setTargetDate();
+		setLogging();
+		createUsers();
+		runAutomator();
+		closeLoggingStreams();
+	} // End of the main method
 
-		// Setting inheritance stuff
-		Properties settings = new Properties();
-		InputStream input = null;
-
-		// Settings variables to be changed
-		int timeDelta = 90;
-		String description = "NYU Phi Kappa Sigma Study Session";
-		String floorNumber = "LL1";
-		String roomNumber = "20";
-		String userLoginsFilePath = "userLogins.csv";
-
-		try
+	private static void runAutomator()
+	{
+		int currentCount = 0;
+		int offset = 0;
+		while ((!USER_POOL.isCompleted()) && (USER_POOL.getNumberOfTerminatedUsers() < 12))
 		{
-			input = new FileInputStream("settings");
-			settings.load(input);
-
-			// Initializes each value from the defaults to the values in the settings file
-			timeDelta = Integer.parseInt(settings.getProperty("timeDelta"));
-			description = settings.getProperty("description");
-			floorNumber = settings.getProperty("floorNumber");
-			roomNumber = settings.getProperty("roomNumber");
-			userLoginsFilePath = settings.getProperty("userLoginFile");
-		}
-		catch (IOException ex)
-		{System.err.println("Settings file could not be read correctly");}
-		finally
-		{
-			if (input != null)
-			{
-				try
-				{input.close();}
-				catch (IOException e)
-				{System.err.println("Error trying to close stream from settings file");}
-			}
-		}
-
-		// Gets the reservation date only once at the start
-		LocalDate currentDate = LocalDate.now();
-		LocalDate reservationDate = currentDate.plusDays(timeDelta);
-
-		// Date in string format
-		String reservationYear = Integer.toString(reservationDate.getYear());
-		String reservationMonth = "";
-
-		try
-		{reservationMonth = toMonth(Integer.toString(reservationDate.getMonthValue()));}
-		catch (MonthException e)
-		{System.out.println(e.getMessage());}
-
-		String reservationDay = Integer.toString(reservationDate.getDayOfMonth());
-
-		// Logging capability stuff
-		File logs = null;
-
-		// Error logging
-		PrintStream pErr = null;
-		FileOutputStream fErr = null;
-		File errors = null;
-
-		// Status logging
-		PrintStream pOut = null;
-		FileOutputStream fOut = null;
-		File status = null;
-
-		try
-		{
-			// Creates the directory hierarchy
-			logs = new File("logs");
-			if (!logs.isDirectory())
-				logs.mkdir();
-			status = new File("logs/status");
-			if (!status.isDirectory())
-				status.mkdir();
-			errors = new File("logs/errors");
-			if (!errors.isDirectory())
-				errors.mkdir();
-
-			fOut = new FileOutputStream(
-					"logs/status/" + reservationDate.toString() + ".status");
-			fErr = new FileOutputStream(
-					"logs/errors/" + reservationDate.toString() + ".err");
-			pOut = new PrintStream(fOut);
-			pErr = new PrintStream(fErr);
-			System.setOut(pOut);
-			System.setErr(pErr);
-		}
-		catch (FileNotFoundException ex)
-		{System.err.println("Couldn't find the logging file");}
-
-		// Checks for user logins .csv file existence
-		File userLogins = new File(userLoginsFilePath);
-
-		try
-		{
-			if (!userLogins.exists() || (userLogins.isDirectory()))
-				throw new IOException("userLogins.csv does not exist, or is a directory");
-		}
-		catch (IOException e)
-		{System.err.println(e.getMessage());}
-
-		// Builds an array of users based off of .csv
-		// Opens file stream
-		FileReader fr = null;
-		BufferedReader br = null;
-		StringTokenizer st = null;
-		ArrayList<User> users = new ArrayList<User>();
-		try {
-			fr = new FileReader(userLogins);
-			br = new BufferedReader(fr);
-			boolean lineSkip = true;
-
-			for (String line; (line = br.readLine()) != null; )
-			{
-				if (lineSkip)
-					lineSkip = false;
-				else
-				{
-					boolean timestampSkip = true;
-					st = new StringTokenizer(line, ",");
-					while (st.hasMoreTokens())
-					{
-						// Advances past the timeStamp
-						if (timestampSkip)
-						{
-							timestampSkip = false;
-							st.nextToken();
-						}
-						else
-						{
-							String username = st.nextToken();
-							String password = st.nextToken();
-
-							// Advances past the years until graduation
-							while (st.hasMoreTokens())
-								st.nextToken();
-							users.add(new User(username, password));
-						}
-					} // End of while loop
-				} // End of else
-			} // End of the for loop
-		} // End of the try block
-		catch (IOException e1)
-		{System.err.println("File could not be found");}
-		finally
-		{
-			try
-			{
-				fr.close();
-				br.close();
-			}
-			catch (IOException e)
-			{System.err.println("File error while trying to close file");}
-		}
-
-		// Start of going through the registration with each user
-		for (int i = 0; i < users.size(); ++i)
-		{
-			// Resets the AM at the end of the loop, since it's a static variable
-			setAM_PM(true);
+			AM_PM = true;
+			int userIndex = -1;
 
 			// Builds a browser connection
 			WebDriver browser = new FirefoxDriver();
 			browser.manage().window().maximize();
 
-			//HtmlUnitDriver browser = new HtmlUnitDriver(BrowserVersion.CHROME);
-			//browser.setJavascriptEnabled(true);
-
 			try
 			{
-				// Starts automation for user
-				System.out.println("User number: " + i + " status: starting");
+				userIndex = USER_POOL.getNextValidUser();
+				if (userIndex == -1)
+					throw new CompletedException("Error: All users have been terminated or aborted");
+				User user = USER_POOL.getUsers().get(userIndex);
 
+				// Starts automation for user
 				browser.get("https://login.library.nyu.edu/users/auth/nyu_shibboleth?auth_type=nyu&institution=NYU");
 
 				// Sleep until the div we want is visible or 15 seconds is over
-				FluentWait<WebDriver> fluentWait = new FluentWait<WebDriver>(browser)
+				FluentWait<WebDriver> fluentWait = new FluentWait<>(browser)
 						.withTimeout(20, TimeUnit.SECONDS)
 						.pollingEvery(500, TimeUnit.MILLISECONDS)
 						.ignoring(NoSuchElementException.class);
@@ -256,13 +134,13 @@ public class Automator
 				WebElement password = browser.findElement(By.xpath("//form[@id='login']/input[2]"));
 
 				// Signs into the bobst reserve with the user's username and password
-				username.sendKeys(users.get(i).getUsername());
-				password.sendKeys(users.get(i).getPassword());
+				username.sendKeys(user.getUsername());
+				password.sendKeys(user.getPassword());
 				browser.findElement(By.xpath("//form[@id='login']/input[3]")).click();
 
 				if (browser.getCurrentUrl().equals("https://shibboleth.nyu.edu:443/idp/Authn/UserPassword") ||
 						(browser.getCurrentUrl().equals("https://shibboleth.nyu.edu/idp/Authn/UserPassword")))
-					throw new InvalidLoginException("User " + i + " had invalid login credentials");
+					throw new InvalidLoginException("User " + currentCount + " had invalid login credentials");
 
 				browser.get("https://rooms.library.nyu.edu/");
 
@@ -278,66 +156,66 @@ public class Automator
 				}
 
 				browser.findElement(By.xpath(
-						"//form[@class='form-horizontal']/div[@class='well well-sm']" + 
+						"//form[@class='form-horizontal']/div[@class='well well-sm']" +
 								"/div[@class='form-group has-feedback']/div[@class='col-sm-6']/input[1]"
-						)).click();
+				)).click();
 
 				Thread.sleep(5000);
 
 				// Checks the month and year, utilizes a wait for the year for the form to pop up
 				WebElement datePickerYear = fluentWait.until(
 						ExpectedConditions.presenceOfElementLocated(By.xpath(
-								"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" + 
-										"div[@class='ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-left']/" + 
+								"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" +
+										"div[@class='ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-left']/" +
 										"div[@class='ui-datepicker-title']/span[@class='ui-datepicker-year']"
-								)));
+						)));
 
 				String datePickerYearText = datePickerYear.getText();
 
 				WebElement datePickerMonth = browser.findElement(By.xpath(
-						"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" + 
+						"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" +
 								"div[@class='ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-left']/" +
 								"div[@class='ui-datepicker-title']/span[@class='ui-datepicker-month']"
-						));
+				));
 				String datePickerMonthText = datePickerMonth.getText();
 
 				// Alters year
-				while (!datePickerYearText.equals(reservationYear))
+				while (!datePickerYearText.equals(RESERVATION_YEAR))
 				{
 					// Right clicks the month until it is the correct year
 					browser.findElement(By.className("ui-icon-circle-triangle-e")).click();
 
 					// Updates the datepicker year
 					datePickerYear = browser.findElement(By.xpath(
-							"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" + 
-									"div[@class='ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-left']/" + 
+							"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" +
+									"div[@class='ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-left']/" +
 									"div[@class='ui-datepicker-title']/span[@class='ui-datepicker-year']"
-							));
+					));
 					datePickerYearText = datePickerYear.getText();
 				}
 
-				// ALters month
-				while (!datePickerMonthText.equals(reservationMonth))
+				// Alters month
+				while (!datePickerMonthText.equals(RESERVATION_MONTH))
 				{
 					// Right clicks the month until it is the correct month
 					browser.findElement(By.className("ui-icon-circle-triangle-e")).click();
 
 					// Updates the datepicker month
 					datePickerMonth = browser.findElement(By.xpath(
-							"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" + 
+							"//div[@id='ui-datepicker-div']/div[@class='ui-datepicker-group ui-datepicker-group-first']/" +
 									"div[@class='ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-left']/" +
 									"div[@class='ui-datepicker-title']/span[@class='ui-datepicker-month']"
-							));
+					));
 					datePickerMonthText = datePickerMonth.getText();
 				}
 
 				// At this point, we are on the correct year & month. Now we select the date
-				browser.findElement(By.linkText(reservationDay)).click();
+				browser.findElement(By.linkText(RESERVATION_DAY)).click();
 
 				// END OF THE FUCKING DATEPICKER
 
 				// Selects the start time
-				int timeStart = getTime(i);
+				int timeStart = getTime(USER_POOL.getNumberOfTerminatedUsers() + offset);
 
 				Select reservationHour = new Select(browser.findElement(By.cssSelector("select#reservation_hour")));
 				reservationHour.selectByValue(Integer.toString(timeStart));
@@ -347,7 +225,7 @@ public class Automator
 
 				// Selects AM/PM
 				Select reservationAMPM = new Select(browser.findElement(By.cssSelector("select#reservation_ampm")));
-				if (isAM_PM())
+				if (AM_PM)
 					reservationAMPM.selectByValue("am");
 				else
 					reservationAMPM.selectByValue("pm");
@@ -371,63 +249,41 @@ public class Automator
 					// Does nothing, since it's a good thing
 				}
 				if (alert != null)
-					throw new ReservationException("The user number: " + i + " has already reserved a room for today");
+					throw new ReservationException("The user number: " + currentCount + " has already reserved a room for today");
 
 				// Waits for the reservation to pop up
 				fluentWait.until(
 						ExpectedConditions.presenceOfElementLocated(
 								By.xpath("//div[@class='modal-content']/div[@class='modal-body']/div[@class='modal-body-content']")
-								));
+						));
 
 				WebElement descriptionElement = fluentWait.until(
 						ExpectedConditions.presenceOfElementLocated(By.id("reservation_title")));
-				descriptionElement.sendKeys(description);
+				descriptionElement.sendKeys(DESCRIPTION);
 
 				// Fills in the duplicate email for the booking
 				WebElement duplicateEmailElement = browser.findElement(By.id("reservation_cc"));
-				duplicateEmailElement.sendKeys(users.get(i).getEmailDuplicate());
+				duplicateEmailElement.sendKeys(user.getEmailDuplicate());
 
 				// Selects the row on the room picker
-				String roomText = "Bobst " + floorNumber + "-" + roomNumber;
+				String roomText = "Bobst " + FLOOR_NUMBER + "-" + ROOM_NUMBER;
 
 				// Locates the room
 				WebElement divFind = browser.findElement(
-						By.xpath(
-								"//form[@id='new_reservation']/table[@id='availability_grid_table']/tbody/tr[contains(., '" + roomText + "')]")
-						);
+						By.xpath("//form[@id='new_reservation']/table[@id='availability_grid_table']/" +
+										"tbody/tr[contains(., '" + roomText + "')]")
+				);
 
-				WebElement timeSlot = null;
-
-				// Tries to get the next best time if it doesn't work
+				WebElement timeSlot;
+				// Selects the timeslot if possible
 				try
 				{
 					timeSlot = divFind.findElement(By.xpath("td[@class='timeslot timeslot_available timeslot_preferred']"));
 				}
 				catch (NoSuchElementException e)
 				{
-					System.err.println("The timeslot was already taken for user: " + i + ", taking next best time");
-					boolean found = false;
-
-					// Continuously clicks the next button and checks until a time is found
-					while (found == false)
-					{
-						try
-						{
-							// Clicks the button once
-							browser.findElement(By.xpath("//div[@class='rebuild_grid rebuild_grid_next']")).click();
-
-							// Rechecks to find the timeSlot
-							timeSlot = divFind.findElement(By.xpath("td[@class='timeslot timeslot_available timeslot_preferred']"));
-
-							// If it gets to this point, the timeslot is found, sets found = true
-							found = true;
-						}
-						catch (NoSuchElementException ex)
-						{
-							// Still didn't find an available timeslot, continues search
-						}	
-					} // End of while loop
-				} // End of finding a time if original preference could not be found
+					throw new TimeslotTakenException("The time slot was already taken for user: " + userIndex + ", moving to next user");
+				}
 
 				timeSlot.click();
 
@@ -435,7 +291,7 @@ public class Automator
 				browser.findElement(By.xpath("//button[@class='btn btn-lg btn-primary']")).click();
 
 				// Waits a bit for confirmation to occur
-				FluentWait<WebDriver> buttonWait = new FluentWait<WebDriver>(browser)
+				FluentWait<WebDriver> buttonWait = new FluentWait<>(browser)
 						.withTimeout(15, TimeUnit.SECONDS)
 						.pollingEvery(500, TimeUnit.MILLISECONDS)
 						.ignoring(NoSuchElementException.class);
@@ -443,91 +299,123 @@ public class Automator
 				buttonWait.until(
 						ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='alert alert-success']")));
 
-				// Final status update
-				System.out.println("User number " + i + " status: successful");
-
 				// Updates the dailyStatus log
-				String militaryTime = toMilitaryTime(i);
+				String militaryTime = toMilitaryTime(USER_POOL.getNumberOfTerminatedUsers() + offset);
 				System.out.println(militaryTime + ": Reserved");
 				Thread.sleep(3000);
+				USER_POOL.markUserCompleted(userIndex);
 			}
-			catch (UserNumberException e)
+			catch (TimeslotTakenException e)
+			{
+				// The timeslot has been taken, but the user is still valid.
+				System.err.println(e.getMessage());
+				++offset;
+			}
+			catch (CompletedException e)
 			{
 				System.err.println(e.getMessage());
-				System.out.println("User number " + i + " status: failed");
-
-				// Updates the dailyStatus log
-				String militaryTime = toMilitaryTime(i);
-				System.out.println(militaryTime + ": Not Reserved");
-			}
-			catch(ReservationException e)
-			{
-				System.err.println(e.getMessage());
-				System.out.println("User number " + i + " status: failed");
-
-				// Updates the dailyStatus log
-				String militaryTime = toMilitaryTime(i);
-				System.out.println(militaryTime + ": Not Reserved");
-			}
-			catch(TimeoutException e)
-			{
-				System.err.println(e.getMessage());
-				System.out.println("User number " + i + " status: failed");
-
-				// Updates the dailyStatus log
-				String militaryTime = toMilitaryTime(i);
-				System.out.println(militaryTime + ": Not Reserved");
-			}
-			catch(InvalidLoginException e)
-			{
-				System.err.println(e.getMessage());
-				System.out.println("User number " + i + " status: failed");
-
-				// Updates the dailyStatus log
-				String militaryTime = toMilitaryTime(i);
-				System.out.println(militaryTime + ": Not Reserved");
+				cleanup(browser);
+				break;
 			}
 			catch (InterruptedException e)
 			{
 				System.err.println("Sleep at end was interrupted");
-				System.out.println("User number " + i + " status: failed");
-
-				// Updates the dailyStatus log
-				String militaryTime = toMilitaryTime(i);
-				System.out.println(militaryTime + ": Not Reserved");
+				System.out.println("User number " + currentCount + " status: failed");
+				USER_POOL.markUserAborted(userIndex);
+			}
+			catch (UserNumberException | ReservationException | TimeoutException | InvalidLoginException e)
+			{
+				System.err.println(e.getMessage());
+				System.out.println("User number " + currentCount + " status: failed");
+				USER_POOL.markUserAborted(userIndex);
 			}
 			catch (Exception e)
 			{
 				System.err.println("Shit, something happened that wasn't caught");
-				System.out.println("User number " + i + " status: failed");
+				System.out.println("User number " + currentCount + " status: failed");
+				USER_POOL.markUserAborted(userIndex);
 				e.printStackTrace();
-
-				// Updates the dailyStatus log
-				String militaryTime = toMilitaryTime(i);
-				System.out.println(militaryTime + ": Not Reserved");
 			}
 			finally
+			{cleanup(browser);}
+		} // End of running through all users
+	} // End of the run automator method
+
+	private static void cleanup(WebDriver browser)
+	{
+		// Logs out
+		browser.get("https://rooms.library.nyu.edu/logout");
+		try
+		{Thread.sleep(10000);}
+		catch (InterruptedException e1)
+		{System.err.println("Something wrong when trying to sleep after logout");}
+
+		// Deletes cookies
+		browser.manage().deleteAllCookies();
+		browser.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+
+		// Closes the browser connection
+		browser.close();
+		try {Thread.sleep(5000);}
+		catch (InterruptedException e)
+		{System.err.println("Sleep at end was interrupted");}
+	} // End of the cleanup method
+
+	private static void createUsers()
+	{
+		// Checks for user logins .csv file existence
+		File userLogins = new File(USER_LOGIN_FILEPATH);
+
+		try
+		{
+			if (!userLogins.exists() || (userLogins.isDirectory()))
+				throw new IOException("userLogins.csv does not exist, or is a directory");
+		}
+		catch (IOException e)
+		{
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+
+		// Builds an array of users based off of .csv
+		FileReader fr = null;
+		BufferedReader br = null;
+		StringTokenizer st;
+		try
+		{
+			fr = new FileReader(userLogins);
+			br = new BufferedReader(fr);
+			USER_POOL = new UserPool(new ArrayList<>());
+
+			for (String line; (line = br.readLine()) != null;)
 			{
-				// Logs out
-				browser.get("https://rooms.library.nyu.edu/logout");
-				try
-				{Thread.sleep(10000);}
-				catch (InterruptedException e1)
-				{System.err.println("Something wrong when trying to sleep after logout");}
-
-				// Deletes cookies
-				browser.manage().deleteAllCookies();
-				browser.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
-				// Closes the browser connection
-				browser.close();
-				System.out.println("Browser is now closed");
-				try {Thread.sleep(5000);}
-				catch (InterruptedException e)
-				{System.err.println("Sleep at end was interrupted");}
+				st = new StringTokenizer(line, ",");
+				while (st.hasMoreTokens())
+				{
+					String username = st.nextToken();
+					String password = st.nextToken();
+					USER_POOL.getUsers().add(new User(username, password));
+				} // End of while loop
 			}
-		} //End of for loop
+		} // End of the try block
+		catch (IOException e1)
+		{System.err.println("File " + USER_LOGIN_FILEPATH + " could not be found");}
+		finally
+		{
+			try
+			{
+				if (fr != null)
+					fr.close();
+				if (br != null)
+					br.close();
+			}
+			catch (IOException e)
+			{System.err.println("File error while trying to close file");}
+		}
+	} // End of the create users method
 
+	private static void closeLoggingStreams()
+	{
 		// Closes logging streams
 		if (pOut != null)
 			pOut.close();
@@ -547,9 +435,110 @@ public class Automator
 			catch (IOException e)
 			{System.err.println("File output error stream had errors when closing");}
 		}
-	} // End of the main method
+	} // End of the close logging stream method
+
+
+	private static void setLogging()
+	{
+		// Logging capability stuff
+		File logs;
+		File errors;
+		File status;
+
+		try
+		{
+			// Creates the directory hierarchy
+			logs = new File("logs");
+			if (!logs.isDirectory())
+				logs.mkdir();
+			status = new File("logs/status");
+			if (!status.isDirectory())
+				status.mkdir();
+			errors = new File("logs/errors");
+			if (!errors.isDirectory())
+				errors.mkdir();
+
+			String reservationDate = RESERVATION_YEAR + "-" + RESERVATION_MONTH + "-" + RESERVATION_DAY;
+
+			fOut = new FileOutputStream(
+					"logs/status/" + reservationDate  + ".status");
+			fErr = new FileOutputStream(
+					"logs/errors/" + reservationDate + ".err");
+			pOut = new PrintStream(fOut);
+			pErr = new PrintStream(fErr);
+			System.setOut(pOut);
+			System.setErr(pErr);
+		}
+		catch (FileNotFoundException ex)
+		{System.err.println("Couldn't find the logging file");}
+	} // End of the set logging method
+
+	private static void setTargetDate()
+	{
+		// Gets the reservation date only once at the start
+		LocalDate currentDate = LocalDate.now();
+		LocalDate reservationDate = currentDate.plusDays(TIME_DELTA);
+
+		// Date in string format
+		RESERVATION_YEAR = Integer.toString(reservationDate.getYear());
+		RESERVATION_MONTH = "";
+
+		try
+		{RESERVATION_MONTH = toMonth(Integer.toString(reservationDate.getMonthValue()));}
+		catch (MonthException e)
+		{
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+
+		RESERVATION_DAY = Integer.toString(reservationDate.getDayOfMonth());
+	} // End of the set target date method
 
 	/* Helper Methods */
+	private static void getAndSetSettings()
+	{
+		// Turns off annoying htmlunit warnings
+		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(java.util.logging.Level.OFF);
+
+		// Setting inheritance stuff
+		Properties settings = new Properties();
+		InputStream input = null;
+
+		// Settings variables to be changed
+		TIME_DELTA = 90;
+		DESCRIPTION = "NYU Phi Kappa Sigma Study Session";
+		FLOOR_NUMBER = "LL1";
+		ROOM_NUMBER = "20";
+		USER_LOGIN_FILEPATH = "userLogins.csv";
+
+		try
+		{
+			input = new FileInputStream("settings");
+			settings.load(input);
+
+			// Initializes each value from the defaults to the values in the settings file
+			TIME_DELTA = Integer.parseInt(settings.getProperty("timeDelta"));
+			DESCRIPTION = settings.getProperty("description");
+			FLOOR_NUMBER = settings.getProperty("floorNumber");
+			ROOM_NUMBER = settings.getProperty("roomNumber");
+			USER_LOGIN_FILEPATH = settings.getProperty("userLoginFile");
+		}
+		catch (IOException ex)
+		{
+			System.err.println("Settings file could not be read correctly");
+			System.exit(1);
+		}
+		finally
+		{
+			if (input != null)
+			{
+				try
+				{input.close();}
+				catch (IOException e)
+				{System.err.println("Error trying to close stream from settings file");}
+			}
+		}
+	} // End of the set settings class
 
 	/**
 	 * Converts the user's time to military time (i.e. 2200) for logging purposes
@@ -558,8 +547,8 @@ public class Automator
 	 */
 	private static String toMilitaryTime(int userID)
 	{
-		int time = getTimePreference()[userID];
-		String stringTime = "";
+		int time = timePreference[userID];
+		String stringTime;
 
 		if (time < 10)
 			stringTime = Integer.toString(time) + "000";
@@ -579,33 +568,46 @@ public class Automator
 		String returnMonth = "";
 		try
 		{
-			if (someMonth.equals("1"))
-				returnMonth = "January";
-			else if (someMonth.equals("2"))
-				returnMonth = "February";
-			else if (someMonth.equals("3"))
-				returnMonth = "March";
-			else if (someMonth.equals("4"))
-				returnMonth = "April";
-			else if (someMonth.equals("5"))
-				returnMonth = "May";
-			else if (someMonth.equals("6"))
-				returnMonth = "June";
-			else if (someMonth.equals("7"))
-				returnMonth = "July";
-			else if (someMonth.equals("8"))
-				returnMonth = "August";
-			else if (someMonth.equals("9"))
-				returnMonth = "September";
-			else if (someMonth.equals("10"))
-				returnMonth = "October";
-			else if (someMonth.equals("11"))
-				returnMonth = "November";
-			else if (someMonth.equals("12"))
-				returnMonth = "December";
-			else
-				throw new MonthException("Month could not be converted from: " + someMonth);
-
+			switch (someMonth) {
+				case "1":
+					returnMonth = "January";
+					break;
+				case "2":
+					returnMonth = "February";
+					break;
+				case "3":
+					returnMonth = "March";
+					break;
+				case "4":
+					returnMonth = "April";
+					break;
+				case "5":
+					returnMonth = "May";
+					break;
+				case "6":
+					returnMonth = "June";
+					break;
+				case "7":
+					returnMonth = "July";
+					break;
+				case "8":
+					returnMonth = "August";
+					break;
+				case "9":
+					returnMonth = "September";
+					break;
+				case "10":
+					returnMonth = "October";
+					break;
+				case "11":
+					returnMonth = "November";
+					break;
+				case "12":
+					returnMonth = "December";
+					break;
+				default:
+					throw new MonthException("Month could not be converted from: " + someMonth);
+			}
 		}
 		catch (MonthException e)
 		{System.out.println(e.getMessage());}
@@ -619,14 +621,14 @@ public class Automator
 	 */
 	private static int getTime(int userNumber) throws UserNumberException
 	{
-		int timeStart = 0;
+		int timeStart;
 		if ((userNumber < 0) || (userNumber > 11))
 			throw new UserNumberException("User number is invalid: " + userNumber);
-		timeStart = getTimePreference()[userNumber];
+		timeStart = timePreference[userNumber];
 
 		if ((timeStart >= 12) && (timeStart < 24))
 		{
-			setAM_PM(false);
+			AM_PM = false;
 			timeStart -= 12;
 		}
 
@@ -636,29 +638,11 @@ public class Automator
 		return timeStart;
 	} // End of the getTime method
 
-	/* Getters and Setters */
-
-	/**
-	 * @return the aM_PM
-	 */
-	public static boolean isAM_PM()
-	{return AM_PM;}
-
-	/**
-	 * @param aM_PM the aM_PM to set
-	 */
-	public static void setAM_PM(boolean aM_PM)
-	{AM_PM = aM_PM;}
-
-	/**
-	 * @return the timePreference
-	 */
-	public static int[] getTimePreference()
-	{return timePreference;}
-
-	/**
-	 * @param timePreference the timePreference to set
-	 */
-	public static void setTimePreference(int[] timePreference)
-	{Automator.timePreference = timePreference;}
+	/* Custom Exception handling */
+	private static class CompletedException extends Throwable {public CompletedException(String s) {super(s);}}
+	private static class TimeslotTakenException extends Throwable {public TimeslotTakenException(String s) {super(s);}}
+	private static class MonthException extends Throwable {public MonthException(String s) {super(s);}}
+	private static class ReservationException extends Throwable {public ReservationException(String s) {super(s);}}
+	private static class UserNumberException extends Throwable {public UserNumberException(String s) {super(s);}}
+	private static class InvalidLoginException extends Throwable {public InvalidLoginException(String s) {super(s);}}
 } // End of the Automator class
