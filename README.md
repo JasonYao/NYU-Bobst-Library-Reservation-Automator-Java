@@ -1,9 +1,11 @@
 # NYU-Bobst-Library-Reservation-Automator-Java
 
 ## Description
-An automator written in Java to automatically book the room you want at Bobst Libarary for New York University students. This software is given as-is, and I am not liable nor responsible for 
-whatever may result of you using this software. NOTE: This software is built for, tested on, and works for linux and OSX systems. If you have a windows machine, I'd normally say that you're shit 
-out of luck, but since this was written in Java, just install Java, and set up a windows scheduler to run java -jar Automator.jar every day, instead of using my pwetty `./time.sh` commands.
+An automator written in Java to automatically book the room you want at Bobst Libarary for New York University students.
+This software is given as-is, and I am not liable nor responsible for whatever may result of you using this software.
+NOTE: This software is built for, tested on, and works for linux and OSX systems. If you have a windows machine,
+I'd normally say that you're shit out of luck, but since this was written in Java, just install Java, and set up
+a windows scheduler to run java -jar Automator.jar every day, instead of using my pwetty `./time.sh` commands.
 
 ## Usage
 
@@ -76,7 +78,13 @@ that was specified in the [settings](settings.py) file.
 In the settings file, we will thus create a list of Users, and simply automate the task of logging in, selecting the time/room,
 filling out all forms required.
 
-This script follows an optimized approach, booking rooms in the order of an arbitrary 'best' time that I have set up beforehand.
+This script follows an optimized approach, booking rooms in the order of an arbitrary 'best' time that I have set up beforehand, but can be changed
+with the `timePreference` value in the [settings](settings.example) file.
+
+## Dependencies
+None, but if you'd like to develop on your own then you'll need to download the [Selenium](http://www.seleniumhq.org/download/) driver.
+
+Current Selenium version: 2.48.2
 
 ## Licensing
 This software is released under the GNU GPL 2.0 License as described in the [License file](LICENSE).

@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="selenium" level="project" />
+    <orderEntry type="library" name="selenium-server-standalone-2.48.2" level="project" />
   </component>
 </module>
