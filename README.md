@@ -1,5 +1,5 @@
 # NYU-Bobst-Library-Reservation-Automator-Java
-By Jason Yao - Current version: v2.1.1
+By Jason Yao - current version: v2.1.1
 
 ## Description
 This program is to automatically book a room at New York University's Bobst Library.
@@ -34,7 +34,10 @@ cp userLogins.csv.example userLogins.csv
 
 Edit the newly created [settings](settings.example) and [userLogins.csv](userLogins.csv.example) files (they're pretty self explanatory)
 
-If you're on linux, edit the [run.sh](run.sh) file, and uncomment the line after installing `vnc`.
+If you're running this program on a Raspberry Pi, edit the [run.sh](run.sh) file, and uncomment the line `export DISPLAY=:0`.
+
+If you're running this program on linux that doesn't have a graphical display (e.g. a fresh VPS on Digital Ocean or AWS), 
+edit the [run.sh](run.sh) file, and uncomment the line `export DISPLAY=localhost:1` after installing `vnc`.
 
 ## Dependency note
 Make sure that there's some version of the java 8.x installed on your machine, as this program has been built with, compiled with, and tested with java 1.8.0_25. 
@@ -48,6 +51,16 @@ Current Selenium version: 2.48.2
 ## Usage
 Usage is the same as on OSX as it is on linux. If you're on windows, then you'll have to look up instructions on how to run a java .jar file, since I'm not going to bother.
 
+### Running the program automatically each day
+The following [script](time.sh) will use `cron` in order to run the program every day at 0001.
+NOTE: Only run this command once, as it will tell the `cron` daemon to run the `./run.sh` command every day at 0001.
+
+```sh
+./time.sh
+```
+
+![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
+
 ### Running the program manually (for testing, or the masochistic)
 This will run the java application, assuming that dependencies are met as stated above.
 ```sh
@@ -59,15 +72,6 @@ OR
 ```sh
 ./run.sh
 ```
-
-### Running the program automatically each day
-The following [script](time.sh) will use `cron` in order to run the program every day at 0001.
-
-```sh
-./time.sh
-```
-
-![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
 
 ## Display issues
 Due to the graphical nature of this program, a graphical display of some kind is required. I highly recommend to just run this program off of a raspberry pi,
