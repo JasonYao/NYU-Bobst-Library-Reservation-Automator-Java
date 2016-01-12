@@ -1,90 +1,85 @@
 # NYU-Bobst-Library-Reservation-Automator-Java
+By Jason Yao - Current version: v2.1.1
 
 ## Description
-An automator written in Java to automatically book the room you want at Bobst Libarary for New York University students.
-This software is given as-is, and I am not liable nor responsible for whatever may result of you using this software.
-NOTE: This software is built for, tested on, and works for linux and OSX systems. If you have a windows machine,
-I'd normally say that you're shit out of luck, but since this was written in Java, just install Java, and set up
-a windows scheduler to run java -jar Automator.jar every day, instead of using my pwetty `./time.sh` commands.
+This program is to automatically book a room at New York University's Bobst Library.
+
+NYU's Bobst library system currently limits the amount of reservations possible to a single booking every 24 hours. Add to the fact that there is no
+way to setup easy automatic bookings, and the need for this program becomes apparent as a student, or for student groups.
+
+## Setup (For unix systems including OSX)
+Open up your terminal, and start copying the code below
+
+Creates a directory out of the way to house the app, and go into the directory
+
+```sh
+mkdir ~/projects
+cd ~/projects
+```
+
+Downloads the application into a new directory
+
+```sh
+git clone https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java.git
+cd NYU-Bobst-Library-Reservation-Automator-Java
+```
+
+Copies the example [settings](settings.example) and [userLogins.csv](userLogins.csv.example) files
+(Note: you can call the .csv file anything you want, as long as you change the name in the settings file)
+
+```sh
+cp settings.example settings
+cp userLogins.csv.example userLogins.csv
+```
+
+Edit the newly created [settings](settings.example) and [userLogins.csv](userLogins.csv.example) files (they're pretty self explanatory)
+
+If you're on linux, edit the [run.sh](run.sh) file, and uncomment the line after installing `vnc`.
+
+## Dependency note
+Make sure that there's some version of the java 8.x installed on your machine, as this program has been built with, compiled with, and tested with java 1.8.0_25. 
+If you have errors, and have an older version of java installed, please update to the latest version, and try again.
+This is the only depency required to run this program.
+
+If you'd like to develop on your own then you'll need to download the [Selenium](http://www.seleniumhq.org/download/) driver.
+
+Current Selenium version: 2.48.2
 
 ## Usage
+Usage is the same as on OSX as it is on linux. If you're on windows, then you'll have to look up instructions on how to run a java .jar file, since I'm not going to bother.
 
-### Initial Directory Setup (For Unix systems including OSX)
+### Running the program manually (for testing, or the masochistic)
+This will run the java application, assuming that dependencies are met as stated above.
+```sh
+java -jar Automator.jar
+```
 
-0.) Open up your terminal, and start copying the codes fragments below
+OR
 
-1.) `mkdir ~/projects` -> Creates a directory out of the way to house the app
+```sh
+./run.sh
+```
 
-2.) `cd ~/projects` -> This will bring you into the just created overarching directory
+### Running the program automatically each day
+The following [script](time.sh) will use `cron` in order to run the program every day at 0001.
 
-3.) `git clone https://github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java.git` -> Downloads the app
-
-4.) `cd NYU-Bobst-Library-Reservation-Automator-Java` -> Brings you into the app directory
-
-5.) `cp settings.example settings` -> Moves the example settings file to the one you'll actually use
-
-6.) `nano settings` -> Edit the settings file using the nano editor, it's pretty self-explanatory. When done with editing, use `CTRL` + `x`, and then `y` and `ENTER` to save the settings file.
-
-7.) Download your user logins file by exporting from the google docs, and then move it into the `~/projects/NYU-Bobst-Library-Reservation-Automator-Java` directory.
-
-### Running the program manually (yuck)
-
-1.) `java -jar Automator.jar` -> This will run the Java applet, assuming you have java installed on your computer.
-
-NOTE: This Java app was built and compiled and tested using Java 1.8.0_25, and so should work for Java 8.x, if you have errors and have an older version of Java, please update first and try again.
-
-### Setup to run the program automatically each day
-
-#### For Unix systems including OSX that have a graphical display
-
-`./time.sh` -> Automatically sets up your script to run at 0001 each day. Ain't this shit easy?
+```sh
+./time.sh
+```
 
 ![Very dogee](https://raw.github.com/JasonYao/NYU-Bobst-Library-Reservation-Automator-Java/master/img/dogee.jpg)
 
-#### For Unix systems including OSX that do NOT have a graphical display
+## Display issues
+Due to the graphical nature of this program, a graphical display of some kind is required. I highly recommend to just run this program off of a raspberry pi,
+since the stock version of it can run this program just fine, compared to running it on a VPS on services like [Digital Ocean](https://www.digitalocean.com/) 
+or [AWS](https://aws.amazon.com/), since `vnc` timeout issues occur.
 
-##### Installing VNC
+### For unix systems that do have a graphical display
+Shit just works, no need to do anything.
 
-I'm not even going to bother here. Follow [Digital Ocean's tutorial](https://www.digitalocean.com/tutorials/how-to-install-and-configure-vnc-on-ubuntu-14-04), and you should be good.
-
-##### Setup and running
-
-`nano run.sh` -> Edit this file and uncomment out the part where I told you to uncomment.
-
-`CTRL` + `x`, `y` -> This will save your changes made
-
-`./time.sh` -> And now you're done, and you're set to automatically run the app at 0001 each day.
-
-## The Explaination
-NYU's Library system makes it annoying for students because each student is limited to one booking every 24 hours.
-This script is meant to help alleviate the issue, by having it done automatically for you.
-
-More notably, there is a quirk of the current system that can help us with these bookings.
-
-1.) The fact that for sanitation purposes, the library system does not actually get rid
-	of duplicates, i.e. `JasonYao@nyu.edu` and `JasonYao+1@nyu.edu` are counted as separate
-	when dealing with emails. What this means: we can exploit this so that the number of
-	friends required to book a room sequentially are lower, enabling us to simply use 1
-	person and their duplicate email for each 2-hour block.
-
-2.) The fact that we can utilize web drivers such as with [Selenium](https://selenium-python.readthedocs.org) that can
-	help us with automation when dealing with web elements.
-
-Utilizing these two axioms, this simplifies the amount of work required to be much less than we'd normally need.
-
-We first will create a new User class per person, with a .name, .password and .email attribute. Each User will be made to login, and book the room
-that was specified in the [settings](settings.py) file.
-
-In the settings file, we will thus create a list of Users, and simply automate the task of logging in, selecting the time/room,
-filling out all forms required.
-
-This script follows an optimized approach, booking rooms in the order of an arbitrary 'best' time that I have set up beforehand, but can be changed
-with the `timePreference` value in the [settings](settings.example) file.
-
-## Dependencies
-None, but if you'd like to develop on your own then you'll need to download the [Selenium](http://www.seleniumhq.org/download/) driver.
-
-Current Selenium version: 2.48.2
+### For unix systems that do **NOT** have a graphical display
+You'll need to install `vnc`. I'm not going to bother showing how, so just following 
+[Digital Ocean's tutorial](https://www.digitalocean.com/tutorials/how-to-install-and-configure-vnc-on-ubuntu-14-04), and you should be good.
 
 ## Licensing
 This software is released under the GNU GPL 2.0 License as described in the [License file](LICENSE).
