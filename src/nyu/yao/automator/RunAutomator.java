@@ -53,9 +53,9 @@ public class RunAutomator
         initiate(browser, wait);
         login(browser, user);
         setDate(browser, wait, setup.getSettings());
-        setTime(browser, offset, setup.getUserPool(), setup.getSettings());
+        TimeTuple timeTuple = setTime(browser, offset, setup.getUserPool(), setup.getSettings());
         selectRoom(browser, user, wait, setup.getSettings());
-        updateLog(user,setup.getUserPool(), offset, setup.getSettings());
+        updateLog(user, setup.getUserPool(), timeTuple);
     } // End of the run method
 
     /**
@@ -173,7 +173,7 @@ public class RunAutomator
      * @param settings a Settings object containing the program settings
      * @throws UserNumberException
      */
-    private static void setTime(WebDriver browser, int offset, UserPool pool, Settings settings)
+    private static TimeTuple setTime(WebDriver browser, int offset, UserPool pool, Settings settings)
             throws UserNumberException
     {
         // Selects the start time
@@ -200,6 +200,8 @@ public class RunAutomator
 
         // Generates the room/time picker
         browser.findElement(By.xpath("//button[@id='generate_grid']")).click();
+
+        return timeTuple;
     } // End of the setTime method
 
     /**
@@ -262,17 +264,17 @@ public class RunAutomator
                 "//div[@class='alert alert-success']")));
     } // End of the selectRoom method
 
+
     /**
      * Updates the log at the end, and marks the user as completed
      * @param user The current user for this run
      * @param pool a UserPool object containing all users for the program
-     * @param offset The current amount of offsets (occurs when a time is already selected, but user is good)
-     * @param settings a Settings object containing the program settings
+     * @param timeTuple A TimeTuple object containing the current registration time
      * @throws InterruptedException
      */
-    private static void updateLog(User user, UserPool pool, int offset, Settings settings) throws InterruptedException
+    private static void updateLog(User user, UserPool pool, TimeTuple timeTuple) throws InterruptedException
     {
-        String militaryTime = toMilitaryTime(pool.getNumberOfTerminatedUsers() + offset, settings);
+        String militaryTime = toMilitaryTime(timeTuple.getTimeStart());
         System.out.println(militaryTime + ": Reserved");
         Thread.sleep(5000);
         pool.markUserCompleted(user);
@@ -306,16 +308,15 @@ public class RunAutomator
 
     /**
      * Converts the user's time to military time (i.e. 2200) for logging purposes
-     * @param userIndex The position of the user
+     * @param time The time that is being converted
      * @return A string with the military version of time
      */
-    private static String toMilitaryTime(int userIndex, Settings settings)
+    private static String toMilitaryTime(int time)
     {
-        int time = settings.getTimePreference()[userIndex];
         String stringTime;
 
         if (time < 10)
-            stringTime = Integer.toString(time) + "000";
+            stringTime = "0" + Integer.toString(time) + "00";
         else
             stringTime = Integer.toString(time) + "00";
         return stringTime;
