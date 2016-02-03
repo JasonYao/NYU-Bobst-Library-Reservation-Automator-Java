@@ -33,7 +33,7 @@ public class Automator
 	/**
 	 * Start of program, wrapper function for all subsequent calls
 	 * @param args Commandline arguments (should be none)
-     */
+	 */
 	public static void main(String[] args)
 	{
 		Setup setup = setup();
@@ -43,7 +43,7 @@ public class Automator
 	/**
 	 * Initial setup of program, including settings input, logging setup, and user pool creation
 	 * @return Returns a Setup object containing the program settings, logging streams, and user pool
-     */
+	 */
 	private static Setup setup()
 	{
 		Settings settings = getAndSetSettings();
@@ -55,7 +55,7 @@ public class Automator
 	/**
 	 * Wrapper for the actual program execution and graceful cleanup
 	 * @param setup A Setup object containing the program settings, logging streams, and user pool
-     */
+	 */
 	private static void runAndCleanup(Setup setup)
 	{
 		runAutomator(setup);
@@ -67,7 +67,7 @@ public class Automator
 	/**
 	 * Initial read in of settings from the settings configuration file
 	 * @return Returns a Settings object containing the program settings
-     */
+	 */
 	private static Settings getAndSetSettings()
 	{
 		// Turns off annoying html-unit warnings
@@ -138,7 +138,7 @@ public class Automator
 	 * Sets up logging streams for the program
 	 * @param settings a Settings object containing the program settings
 	 * @return A Logger object containing the logging streams
-     */
+	 */
 	private static Logger setLogging(Settings settings)
 	{
 		Path logs = Paths.get("logs");
@@ -196,7 +196,7 @@ public class Automator
 	 * Creates a user pool based off of the user login information .csv file
 	 * @param settings a Settings object containing the program settings
 	 * @return Returns a UserPool object containing all users for the program
-     */
+	 */
 	private static UserPool createUsers(Settings settings)
 	{
 		// Checks for user logins .csv file existence
@@ -222,7 +222,7 @@ public class Automator
 	/**
 	 * Wrapper & elegant error handling method for all runs in the automator
 	 * @param setup a Setup object containing the program settings, logging streams, and user pool
-     */
+	 */
 	private static void runAutomator(Setup setup)
 	{
 		// Local references for code clarity & efficient call operations
@@ -309,7 +309,7 @@ public class Automator
 	/**
 	 * [Cleanup Method] Closes all logging redirect streams
 	 * @param setup A Setup containing all Settings, Loggers, and user pools
-     */
+	 */
 	private static void closeLoggingStreams(Setup setup)
 	{
 		// Closes std.out redirect stream
@@ -384,7 +384,7 @@ public class Automator
 	 * @param timeDelta The number of days from today that is the target
 	 * @return Returns a Target containing the reservation year, month and day
 	 * @throws MonthException Throws an exception when the reservation month could not be parsed
-     */
+	 */
 	private static Target setTargetDate(int timeDelta) throws MonthException
 	{
 		// Gets the reservation date only once at the start
@@ -401,26 +401,26 @@ public class Automator
 	/**
 	 * [Helper Method] Gracefully cleans up all browser-related things, including cache and cookie clearing
 	 * @param browser The browser that is bring shutdown
-     */
+	 */
 	private static void cleanup(WebDriver browser)
-    {
-        // Logs out
-        browser.get("https://rooms.library.nyu.edu/logout");
-        try
-        {Thread.sleep(10000);}
-        catch (InterruptedException e)
-        {System.err.println("Error: Cleanup of browser was interrupted when trying to sleep after logout");}
+	{
+		// Logs out
+		browser.get("https://rooms.library.nyu.edu/logout");
+		try
+		{Thread.sleep(10000);}
+		catch (InterruptedException e)
+		{System.err.println("Error: Cleanup of browser was interrupted when trying to sleep after logout");}
 
-        // Deletes cookies
-        browser.manage().deleteAllCookies();
-        browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		// Deletes cookies
+		browser.manage().deleteAllCookies();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-        // Closes the browser connection
-        browser.close();
-        try {Thread.sleep(5000);}
-        catch (InterruptedException e)
-        {System.err.println("Error: Closing of browser was interrupted when trying to sleep after browser close");}
-    } // End of the cleanup method
+		// Closes the browser connection
+		browser.close();
+		try {Thread.sleep(5000);}
+		catch (InterruptedException e)
+		{System.err.println("Error: Closing of browser was interrupted when trying to sleep after browser close");}
+	} // End of the cleanup method
 
 	/* Custom Exception handling */
 	protected static class CompletedException extends Throwable {public CompletedException(String s) {super(s);}}
