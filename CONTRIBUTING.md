@@ -3,12 +3,7 @@ This document is for people interested in either contributing back to this repos
 or for those who wish to generate their own `.jar` binary (good on you for being paranoid) on the internet.
 
 ## Contributing
-There is no code of conduct here. Don't be an ass, but do be critical, of the current code in the repository, 
-to your own code that you're submitting for pulls, or to the code that others may write.
-
-This is **not** a safe space. The only thing that matters is your code, so if it's subpar and glaringly so, 
-don't be surprised if I or anybody else calls you out on it before rejecting your pull request with our notes. 
-If this doesn't sit well with you, feel free to fork this repo and create your own project with your own rules.
+Please follow the code of merit outlined [here](CODE_OF_MERIT.md).
 
 ## Development environment setup
 There's a few things to do to setup our development environment.
@@ -67,4 +62,10 @@ This one is IDE dependent. The following image shows how to do so with [JetBrain
 If everything worked, then your `.jar` file that was generated should be at 
 `~/projects/NYU-Bobst-Library-Reservation-Automator-Java/out/artifacts/NYU_Bobst_Library_Reservation_Automator_Java_jar/NYU-Bobst-Library-Reservation-Automator-Java.jar`
 
-Whenever you're done making changes, and would like to test it out, simple regenerate your artifact.
+Whenever you're done making changes, and would like to test it out, simple regenerate your artifact by running step 7 again. 
+You can then move the `.jar` file to the root of the directory, and rename it to [Automator.jar](Automator.jar) with the following command:
+
+```sh
+mv ~/projects/NYU-Bobst-Library-Reservation-Automator-Java/out/artifacts/NYU_Bobst_Library_Reservation_Automator_Java_jar/NYU-Bobst-Library-Reservation-Automator-Java.jar 
+~/projects/NYU-Bobst-Library-Reservation-Automator-Java/Automator.jar
+```
