@@ -1,5 +1,5 @@
 # NYU Bobst Library Reservation Automator
-By Jason Yao - current version: v2.1.2
+By Jason Yao - current version: v2.2.1
 
 ## Description
 This program's purpose is to automatically book a room at New York University's Bobst Library every day.

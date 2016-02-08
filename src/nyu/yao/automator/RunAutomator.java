@@ -63,11 +63,16 @@ public class RunAutomator
      * @param browser The current browser for this run
      * @param wait The fluent wait that is to be used when waiting for an element to appear
      */
-    private static void initiate(WebDriver browser, FluentWait<WebDriver> wait)
+    private static void initiate(WebDriver browser, FluentWait<WebDriver> wait) throws TimeoutException
     {
         browser.manage().window().maximize();
-        browser.get("https://login.library.nyu.edu/users/auth/nyu_shibboleth?auth_type=nyu&institution=NYU");
-        wait.until((Function<WebDriver, WebElement>) driver -> driver.findElement(By.xpath("//form[@id='login']")));
+        try
+        {
+            browser.get("https://login.library.nyu.edu/users/auth/nyu_shibboleth?auth_type=nyu&institution=NYU");
+            wait.until((Function<WebDriver, WebElement>) driver -> driver.findElement(By.xpath("//form[@id='login']")));
+        }
+        catch (TimeoutException e)
+        {throw new TimeoutException("Error: Unable to start reach start page, internet may not be connected");}
     } // End of the initiate method
 
     /**
