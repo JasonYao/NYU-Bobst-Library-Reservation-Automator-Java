@@ -253,16 +253,17 @@ public class RunAutomator
         WebElement timeSlot;
         // Selects the time slot if possible
         try
-        {
-            timeSlot = divFind.findElement(By.xpath("td[@class='timeslot timeslot_available timeslot_preferred']"));
-        }
+        {timeSlot = divFind.findElement(By.xpath("td[@class='timeslot timeslot_available timeslot_preferred']"));}
         catch (NoSuchElementException e)
         {throw new TimeSlotTakenException("Error: The current time slot was already taken, moving to next user");}
 
         timeSlot.click();
 
         // Submits
-        browser.findElement(By.xpath("//button[@class='btn btn-lg btn-primary']")).click();
+        try
+        {browser.findElement(By.xpath("//button[@class='btn btn-lg btn-primary']")).click();}
+        catch (NoSuchElementException e)
+        {throw new ReservationException("Error: User " + user.getUsername() + " was unable to submit the request.");}
 
         // Waits a bit for confirmation to occur
         wait.until((Function<WebDriver, WebElement>) driver -> driver.findElement(By.xpath(
