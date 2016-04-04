@@ -261,7 +261,7 @@ public class RunAutomator
 
         // Submits
         try
-        {browser.findElement(By.xpath("//button[@class='btn btn-lg btn-primary']")).click();}
+        {browser.findElement(By.xpath("button[@class='btn btn-lg btn-primary']")).click();}
         catch (NoSuchElementException e)
         {throw new ReservationException("Error: User " + user.getUsername() + " was unable to submit the request.");}
 
