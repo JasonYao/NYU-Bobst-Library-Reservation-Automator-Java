@@ -9,6 +9,7 @@ cd ~/projects/NYU-Bobst-Library-Reservation-Automator-Java/
 # Checks for directory existance
 if [! -d "lib"];
 then
+	echo "Creating library directory"
 	mkdir lib
 fi
 
@@ -18,6 +19,7 @@ then
 	# Driver is already downloaded
 else
 	# Driver has not been downloaded yet
+	echo "Downloading the chrome driver"
 	if ["$(uname -s)" == "Darwin"];
 	then
 		wget https://chromedriver.storage.googleapis.com/2.21/chromedriver_mac32.zip -O chromedriver.zip
