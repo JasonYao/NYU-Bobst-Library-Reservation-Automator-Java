@@ -5,7 +5,7 @@ package nyu.yao.automator;
  */
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 /**
  * Time imports
@@ -84,6 +84,7 @@ public class Automator
 		String userLoginFilePath= null;
 		int[] timePreference= null;
 		Target target = null;
+		String chromeDriver = null;
 
 		try
 		{
@@ -101,6 +102,7 @@ public class Automator
 			floorNumber = settings.getProperty("floorNumber");
 			roomNumber = settings.getProperty("roomNumber");
 			userLoginFilePath = settings.getProperty("userLoginFile");
+			chromeDriver = settings.getProperty("chromeDriver");
 
 			// Tokenises the time preference string into an int array
 			String[] timePreferenceString = settings.getProperty("timePreference").split(" ");
@@ -131,7 +133,7 @@ public class Automator
 			}
 		}
 
-		return new Settings(description, floorNumber, roomNumber, userLoginFilePath, timePreference, target);
+		return new Settings(description, floorNumber, roomNumber, userLoginFilePath, timePreference, target, chromeDriver);
 	} // End of the get and set settings method
 
 	/**
@@ -248,7 +250,9 @@ public class Automator
 					throw new CompletedException("Error: All users have been terminated or aborted");
 
 				user = pool.getUsers().get(userIndex);
-				browser = new FirefoxDriver();
+
+				System.setProperty("webdriver.chrome.driver", setup.getSettings().getChromeDriver());
+				browser = new ChromeDriver();
 				RunAutomator.run(browser, user, offset, setup);
 			}
 			catch (CompletedException e)
