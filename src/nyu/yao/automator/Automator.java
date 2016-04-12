@@ -6,6 +6,7 @@ package nyu.yao.automator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 
 /**
  * Time imports
@@ -250,6 +251,12 @@ public class Automator
 				user = pool.getUsers().get(userIndex);
 				browser = new FirefoxDriver();
 				RunAutomator.run(browser, user, offset, setup);
+			}
+			catch (UnreachableBrowserException e)
+			{
+				System.err.println("Error: Unable to reach browser, please check internet connection");
+				errors.flush();
+				pool.markUserAborted(user);
 			}
 			catch (CompletedException e)
 			{
