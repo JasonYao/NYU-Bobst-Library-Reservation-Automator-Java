@@ -299,18 +299,18 @@ public class RunAutomator
             throw new UserNumberException("User number is invalid: " + userIndex);
 
         int timeStart = settings.getTimePreference()[userIndex];
-        boolean am_pm = true;
+        boolean isAM = true;
 
         if ((timeStart >= 12) && (timeStart < 24))
         {
-            am_pm = false;
+            isAM = false;
             timeStart -= 12;
         }
 
         if (timeStart == 0)
             timeStart = 12;
 
-        return new TimeTuple(timeStart, am_pm);
+        return new TimeTuple(timeStart, isAM);
     } // End of the getTime method
 
     /**
