@@ -6,6 +6,7 @@ package nyu.yao.automator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.NotConnectedException;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
 /**
@@ -251,6 +252,12 @@ public class Automator
 				user = pool.getUsers().get(userIndex);
 				browser = new FirefoxDriver();
 				RunAutomator.run(browser, user, offset, setup);
+			}
+			catch (NotConnectedException e)
+			{
+				System.err.print("Error: Unable to open firefox, please check you have a display set");
+				errors.flush();
+				pool.markUserAborted(user);
 			}
 			catch (UnreachableBrowserException e)
 			{

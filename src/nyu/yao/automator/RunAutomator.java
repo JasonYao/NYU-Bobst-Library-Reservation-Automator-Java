@@ -2,6 +2,7 @@ package nyu.yao.automator;
 
 /* Selenium imports */
 import org.openqa.selenium.*;
+import org.openqa.selenium.firefox.NotConnectedException;
 import org.openqa.selenium.support.ui.FluentWait;
 
 /* Time imports */
@@ -41,7 +42,7 @@ public class RunAutomator
      */
     public static void run(WebDriver browser, User user, int offset, Setup setup)
             throws CompletedException, TimeSlotTakenException, InterruptedException, UserNumberException,
-            ReservationException, InvalidLoginException
+            ReservationException, InvalidLoginException, NotConnectedException
     {
         // Defines the wait
         FluentWait<WebDriver> wait = new FluentWait<>(browser)
