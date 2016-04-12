@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+
+set -e
 
 # Goes into the folder
 cd ~/projects/NYU-Bobst-Library-Reservation-Automator-Java/
