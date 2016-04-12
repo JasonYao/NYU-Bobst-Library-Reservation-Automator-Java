@@ -15,7 +15,6 @@ public class Settings
     private String reservationYear;
     private String reservationMonth;
     private String reservationDay;
-    private String chromeDriver;
 
     /**
      * Constructor for the Settings class
@@ -27,7 +26,7 @@ public class Settings
      * @param target A Target containing the target reservation year, month, and day
      */
     protected Settings (String description, String floorNumber,
-                        String roomNumber, String userLoginFilePath, int[] timePreference, Target target, String chromeDriver)
+                        String roomNumber, String userLoginFilePath, int[] timePreference, Target target)
     {
         setDescription(description);
         setFloorNumber(floorNumber);
@@ -37,12 +36,9 @@ public class Settings
         setReservationYear(target.getReservationYear());
         setReservationMonth(target.getReservationMonth());
         setReservationDay(target.getReservationDay());
-        setChromeDriver(chromeDriver);
     } // End of the settings constructor
 
     /* Getters & Setters */
-    public String getChromeDriver() {return chromeDriver;}
-    public void setChromeDriver(String chromeDriver) {this.chromeDriver = chromeDriver;}
     public String getDescription() {return description;}
     private void setDescription(String description) {this.description = description;}
     public String getFloorNumber() {return floorNumber;}
